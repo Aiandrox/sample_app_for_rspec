@@ -2,13 +2,15 @@ require 'rails_helper'
 
 RSpec.describe Task, type: :model do
   describe 'validation' do
-    let(:new_task) { Task.new(title: title, status: status) }
+    let(:new_task) { build(:task, title: title, status: status) }
     let(:title) { 'タイトル' }
     let(:status) { :todo }
-    let(:task) { create(:task) }
 
-    it '全て入力されている場合 有効' do
-      expect(task).to be_valid
+    context '全て入力されている場合' do
+      let(:task) { create(:task) }
+      it '有効' do
+        expect(task).to be_valid
+      end
     end
 
     context 'タイトルが入力されていない場合' do
@@ -18,15 +20,17 @@ RSpec.describe Task, type: :model do
       end
     end
 
-    it 'タイトルが重複する場合 無効' do
-      task
-      expect(new_task).to be_invalid
+    context 'タイトルが重複する場合' do
+      let!(:task_with_duplicated_title) { create(:task) }
+      it '無効' do
+        expect(new_task).to be_invalid
+      end
     end
 
     context 'タイトルが重複しない場合' do
+      let!(:task_with_duplicated_title) { create(:task) }
       let(:title) { '違うタイトル' }
       it '有効' do
-        task
         expect(new_task).to be_valid
       end
     end
