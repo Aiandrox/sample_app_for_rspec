@@ -25,7 +25,7 @@ RSpec.describe Task, type: :model do
 
     context 'タイトルが重複しない場合' do
       let(:title) { '違うタイトル' }
-      it '無効' do
+      it '有効' do
         task
         expect(new_task).to be_valid
       end
