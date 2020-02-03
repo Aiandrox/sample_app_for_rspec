@@ -42,11 +42,11 @@ RSpec.describe Task, type: :model do
       end
     end
 
-    # context '設定されていないステータスを入力した場合' do
-    #   let(:status) { 'not_set' }
-    #   it '無効' do
-    #     expect(new_task).to be_invalid
-    #   end
-    # end
+    context '設定されていないステータスを入力した場合' do
+      subject { -> { let(:status) { :not_set } } }
+      it '例外を返す' do
+        expect(subject).to raise_error(StandardError)
+      end
+    end
   end
 end
