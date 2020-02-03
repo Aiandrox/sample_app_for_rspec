@@ -2,36 +2,47 @@ require 'rails_helper'
 
 RSpec.describe Task, type: :model do
   describe 'validation' do
+    let(:new_task) { Task.new(title: title, status: status) }
+    let(:title) { 'タイトル' }
+    let(:status) { :todo }
+    let(:task) { create(:task) }
+
     it '全て入力されている場合 有効' do
-      task = Task.new(title: 'タイトル', status: 'todo')
       expect(task).to be_valid
     end
 
-    it 'タイトルが入力されていない場合 無効' do
-      task = Task.new(title: '', status: 'todo')
-      expect(task).to be_invalid
+    context 'タイトルが入力されていない場合' do
+      let(:title) { '' }
+      it '無効' do
+        expect(new_task).to be_invalid
+      end
     end
 
     it 'タイトルが重複する場合 無効' do
-      existing_task = create(:task)
-      task = Task.new(title: 'タイトル', status: 'todo')
-      expect(task).to be_invalid
+      task
+      expect(new_task).to be_invalid
     end
 
-    it '違うタイトルの場合 有効' do
-      existing_task = create(:task)
-      task = Task.new(title: '違うタイトル', status: 'todo')
-      expect(task).to be_valid
+    context 'タイトルが重複しない場合' do
+      let(:title) { '違うタイトル' }
+      it '無効' do
+        task
+        expect(new_task).to be_valid
+      end
     end
 
-    it 'ステータスが設定されていない場合 無効' do
-      task = Task.new(title: 'タイトル', status: '')
-      expect(task).to be_invalid
+    context 'ステータスが空白の場合' do
+      let(:status) { '' }
+      it '無効' do
+        expect(new_task).to be_invalid
+      end
     end
 
-    # it '設定以外のステータスの場合 無効' do
-    #   task = Task.new(title: 'タイトル', status: 4)
-    #   expect(task).to raise_error
+    # context '設定されていないステータスを入力した場合' do
+    #   let(:status) { 'not_set' }
+    #   it '無効' do
+    #     expect(new_task).to be_invalid
+    #   end
     # end
   end
 end
