@@ -1,5 +1,5 @@
 FactoryBot.define do
-  sequence(:title, "title_1")
+  sequence(:title) { |n| "title_#{n}" }
 
   factory :task do
     title { generate :title }
