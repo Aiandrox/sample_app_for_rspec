@@ -3,22 +3,8 @@ require 'rails_helper'
 RSpec.describe Task, type: :model do
   describe 'validation' do
     let(:new_task) { build(:task, title: title, status: status) }
-    let(:title) { 'タイトル' }
+    let(:title) { 'title_1' }
     let(:status) { :todo }
-
-    context '全て入力されている場合' do
-      let(:task) { create(:task) }
-      it '有効' do
-        expect(task).to be_valid
-      end
-    end
-
-    context 'タイトルが入力されていない場合' do
-      let(:title) { '' }
-      it '無効' do
-        expect(new_task).to be_invalid
-      end
-    end
 
     context 'タイトルが重複する場合' do
       let!(:task) { create(:task) }
@@ -30,9 +16,16 @@ RSpec.describe Task, type: :model do
 
     context 'タイトルが重複しない場合' do
       let!(:task) { create(:task) }
-      let(:title) { '違うタイトル' }
+      let(:title) { 'different_title' }
       it '有効' do
         expect(new_task).to be_valid
+      end
+    end
+
+    context 'タイトルが入力されていない場合' do
+      let(:title) { '' }
+      it '無効' do
+        expect(new_task).to be_invalid
       end
     end
 
@@ -47,6 +40,13 @@ RSpec.describe Task, type: :model do
       subject { -> { let(:status) { :not_set } } }
       it '例外を返す' do
         expect(subject).to raise_error(StandardError)
+      end
+    end
+
+    context '全て入力されている場合' do
+      let(:task) { create(:task) }
+      it '有効' do
+        expect(task).to be_valid
       end
     end
   end
