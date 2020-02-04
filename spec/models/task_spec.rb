@@ -21,14 +21,15 @@ RSpec.describe Task, type: :model do
     end
 
     context 'タイトルが重複する場合' do
-      let!(:task_with_duplicated_title) { create(:task) }
+      let!(:task) { create(:task) }
+      let(:task_with_duplicated_title) { new_task }
       it '無効' do
-        expect(new_task).to be_invalid
+        expect(task_with_duplicated_title).to be_invalid
       end
     end
 
     context 'タイトルが重複しない場合' do
-      let!(:task_with_duplicated_title) { create(:task) }
+      let!(:task) { create(:task) }
       let(:title) { '違うタイトル' }
       it '有効' do
         expect(new_task).to be_valid
