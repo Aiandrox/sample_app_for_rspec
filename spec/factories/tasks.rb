@@ -4,6 +4,5 @@ FactoryBot.define do
   factory :task do
     title { generate :title }
     status { :todo }
-    user
   end
 end
