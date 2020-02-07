@@ -46,21 +46,27 @@ RSpec.describe "UserSessions", type: :system do
 
   describe 'アクセス制限' do
     let!(:task) { create(:task) }
+    shared_examples_for 'ログインページにリダイレクト' do
+      it { expect(current_path).to eq login_path }
+    end
+    shared_examples_for 'ログイン要求メッセージを表示' do
+      it { expect(page).to have_content 'Login required' }
+    end
     describe '未ログインユーザー' do
       context 'タスク新規作成ページにアクセスするとき' do
         before { visit new_task_path } 
-        it('ログイン要求メッセージを表示') { expect(page).to have_content 'Login required' }
-        it('ログインページにリダイレクト') { expect(current_path).to eq login_path }
+        it_behaves_like 'ログイン要求メッセージを表示'
+        it_behaves_like 'ログインページにリダイレクト'
       end
       context 'タスク編集ページにアクセスするとき' do
         before { visit edit_task_path(task) }
-        it('ログイン要求メッセージを表示') { expect(page).to have_content 'Login required' }
-        it('ログインページにリダイレクト') { expect(current_path).to eq login_path }
+        it_behaves_like 'ログイン要求メッセージを表示'
+        it_behaves_like 'ログインページにリダイレクト'
       end
       context 'マイページにアクセスするとき' do
         before { visit user_path(user) }
-        it('ログイン要求メッセージを表示') { expect(page).to have_content 'Login required' }
-        it('ログインページにリダイレクト') { expect(current_path).to eq login_path }
+        it_behaves_like 'ログイン要求メッセージを表示'
+        it_behaves_like 'ログインページにリダイレクト'
       end
     end
     describe 'ログインユーザー' do
@@ -68,10 +74,6 @@ RSpec.describe "UserSessions", type: :system do
       context 'タスク新規作成ページにアクセスするとき' do
         before { visit new_task_path }
         it('正しく遷移') { expect(current_path).to eq new_task_path }
-      end
-      xcontext 'タスク編集ページにアクセスするとき' do
-        before { visit edit_task_path(task) }
-        it('正しく遷移') { expect(current_path).to eq edit_task_path(task) }
       end
       context 'マイページにアクセスするとき' do
         before { visit user_path(user) }

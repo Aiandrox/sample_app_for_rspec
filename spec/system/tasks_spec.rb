@@ -74,7 +74,7 @@ RSpec.describe "Tasks", type: :system do
           expect(page).to have_selector '#error_explanation', text: "Title can't be blank"
         end
         it('タスク編集画面のまま') { expect(current_path).to eq task_path(my_task) }
-        it '入力したデータが残っている' do
+        it '入力内容が残っている' do
           expect(page).to have_field 'Content', with: "Updated task's content"
           expect(page).to have_select 'Status', selected: 'doing'
         end
