@@ -2,7 +2,11 @@ require 'rails_helper'
 
 RSpec.describe "Tasks", type: :system do
   let(:user) { create(:user) }
+  let!(:my_task) { create(:task, user_id: user.id) }
+  let(:other_user) { create(:user) }
+  let!(:other_users_task) { create(:task, user_id: other_user.id) }
   before { login(user) }
+
   describe 'タスクを新規作成するとき' do
     before do
       visit root_path
@@ -37,9 +41,6 @@ RSpec.describe "Tasks", type: :system do
   end
 
   describe 'タスク編集' do
-    let!(:my_task) { create(:task, user_id: user.id) }
-    let(:other_user) { create(:user) }
-    let!(:other_users_task) { create(:task, user_id: other_user.id) }
     context '他人のタスク編集ページにアクセスするとき' do
       before { visit edit_task_path(other_users_task) }
       it('アクセス制限メッセージを表示') { expect(page).to have_content 'Forbidden access.' }
@@ -81,24 +82,53 @@ RSpec.describe "Tasks", type: :system do
     end
   end
 
-  xdescribe 'タスク削除' do
-    let(:my_task) { create(:task, user_id: user.id) }
-    let(:other_user) { create(:user) }
-    let(:other_users_task) { create(:task, user_id: other_user.id) }
-    context '他人のタスクを削除するとき' do
-      before { page.driver.link :delete, task_path(other_users_task), {} }
+  describe 'タスク削除' do
+    xcontext '他人のタスクを削除するとき' do
+      before {  } # destroyアクションにアクセスする
       it('アクセス制限メッセージを表示') { expect(page).to have_content 'Forbidden access.' }
       it('ルートにリダイレクト') { expect(current_path).to eq root_path }
     end
     context '自分のタスクを削除するとき' do
       before do
         visit root_path
+        click_link 'Destroy', href: task_path(my_task)
+      end
+      it('確認ダイアログを表示') { expect(page.driver.browser.switch_to.alert.text).to eq 'Are you sure?' }
+      context 'タスクの削除を許可するとき' do
+        before { page.driver.browser.switch_to.alert.accept }
+        it('タスク削除成功メッセージを表示') {expect(page).to have_content 'Task was successfully destroyed.' }
+        it('タスク一覧ページにリダイレクト') { expect(current_path).to eq tasks_path }
+        it('タスク一覧ページからタイトルが削除'){ expect(page).to have_no_content my_task.title }
+      end
+      context 'タスクの削除をキャンセルするとき' do
+        before { page.driver.browser.switch_to.alert.dismiss }
+        it('ルートのまま') { expect(current_path).to eq root_path }
+        it('タスク一覧ページにタイトルが存在する') { expect(page).to have_content my_task.title }
       end
     end
   end
 
   describe 'タスクの表示' do
-    # マイページにタスクを表示
-    # 自分以外のタスクには編集削除ボタンが非表示
+    context 'タスク一覧画面' do
+      before { visit tasks_path }
+      it '全てのタスクにShowボタンを表示' do
+        expect(page).to have_link 'Show', href: task_path(my_task)
+        expect(page).to have_link 'Show', href: task_path(other_users_task)
+      end
+      it '自分のタスクにEdit/Destroyボタンを表示' do
+        expect(page).to have_link 'Edit', href: edit_task_path(my_task)
+        expect(page).to have_link 'Destroy', href: task_path(my_task)
+      end
+      it '他人のタスクにはEdit/Destroyボタンが非表示' do
+        expect(page).to have_no_link 'Edit', href: edit_task_path(other_users_task)
+        expect(page).to have_no_link 'Destroy', href: task_path(other_users_task)
+      end
+    end
+    context 'マイページ' do
+      before { visit user_path(user) }
+      it('自分のタスクの数を表示') { expect(page).to have_content user.tasks.count }
+      it('自分のタスクを表示') { expect(page).to have_content my_task.title }
+      it('他人のタスクは非表示') { expect(page).to have_no_content other_users_task.title }
+    end
   end
 end
