@@ -5,66 +5,75 @@ RSpec.describe "UserSessions", type: :system do
   let!(:user) { create(:user) }
   let!(:task) { create(:task) }
   describe 'ログイン前' do
-    before do
-      visit login_path
-      task = create(:task)
-    end
-    context 'フォームの入力値が正常' do
+    before { visit login_path }
+    context 'フォームの入力値が正常なとき' do
       before do
         fill_in 'Email', with: 'email@example.com'
         fill_in 'Password', with: 'password'
         click_button 'Login'
       end
-      it('ログイン成功メッセージを表示'){ expect(page).to have_content 'Login successful' }
-      it('ルートに遷移'){ expect(current_path).to eq root_path }
+      it('ログイン成功メッセージを表示') { expect(page).to have_content 'Login successful' }
+      it('ルートに遷移') { expect(current_path).to eq root_path }
     end
-    context 'メールアドレスが未入力' do
+    context 'メールアドレスが未入力のとき' do
       before do
         fill_in 'Email', with: ''
         fill_in 'Password', with: 'password'
         click_button 'Login'
       end
-      it('ログイン失敗メッセージを表示'){ expect(page).to have_content 'Login failed' }
-      it('ログイン画面のまま'){ expect(current_path).to eq login_path }
+      it('ログイン失敗メッセージを表示') { expect(page).to have_content 'Login failed' }
+      it('ログイン画面のまま') { expect(current_path).to eq login_path }
     end
-    context 'パスワードが不適' do
+    context 'パスワードが不適なとき' do
       before do
         fill_in 'Email', with: 'email@example.com'
         fill_in 'Password', with: 'not_password'
         click_button 'Login'
       end
-      it('ログイン失敗'){ expect(page).to have_content 'Login failed' }
-      it('ログイン画面のまま'){ expect(current_path).to eq login_path }
+      it('ログイン失敗メッセージを表示') { expect(page).to have_content 'Login failed' }
+      it('ログイン画面のまま') { expect(current_path).to eq login_path }
     end
-    context 'ユーザー限定機能' do
-      it 'タスク新規作成ページにアクセスできない' do
-        visit new_task_path
-        expect(current_path).to eq login_path
+    describe 'ユーザー限定機能へのアクセス' do
+      context 'タスク新規作成ページにアクセスするとき' do
+        before { visit new_task_path } 
+        it('ログイン要求メッセージを表示') { expect(page).to have_content 'Login required' }
+        it('ログインページにリダイレクト') { expect(current_path).to eq login_path }
       end
-      it 'タスク編集ページにアクセスできないこと' do
-        visit edit_task_path(task)
-        expect(current_path).to eq login_path
+      context 'タスク編集ページにアクセスするとき' do
+        before { visit edit_task_path(task) }
+        it('ログイン要求メッセージを表示') { expect(page).to have_content 'Login required' }
+        it('ログインページにリダイレクト') { expect(current_path).to eq login_path }
       end
-      it 'マイページにアクセスできないこと' do
-        visit user_path(user)
-        expect(current_path).to eq login_path
+      context 'マイページにアクセスするとき' do
+        before { visit user_path(user) }
+        it('ログイン要求メッセージを表示') { expect(page).to have_content 'Login required' }
+        it('ログインページにリダイレクト') { expect(current_path).to eq login_path }
       end
     end
   end
 
   describe 'ログイン後' do
-    context 'ユーザー限定機能' do
-
+    before { login(user) }
+    describe 'ユーザー限定機能へのアクセス' do
+      context 'タスク新規作成ページにアクセスするとき' do
+        before { visit new_task_path }
+        it('正しく遷移') { expect(current_path).to eq new_task_path }
+      end
+      xcontext 'タスク編集ページにアクセスするとき' do
+        before { visit edit_task_path(task) }
+        it('正しく遷移') { expect(current_path).to eq edit_task_path(task) }
+      end
+      context 'マイページにアクセスするとき' do
+        before { visit user_path(user) }
+        it('正しく遷移') { expect(current_path).to eq user_path(user) }
+      end
     end
     context 'ログアウトボタンを押す' do
       before do
-        login(user)
         click_link 'Logout'
       end
-      it 'ログアウト成功' do
-        expect(page).to have_content 'Logged out'
-        expect(current_path).to eq root_path
-      end
+      it('ログアウト成功メッセージを表示') { expect(page).to have_content 'Logged out' }
+      it('ルートに遷移') { expect(current_path).to eq root_path }
     end
   end
 end
