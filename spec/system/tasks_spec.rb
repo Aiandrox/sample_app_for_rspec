@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe "Tasks", type: :system do
   let(:user) { create(:user) }
-  let!(:my_task) { create(:task, user_id: user.id) }
+  let!(:my_task) { create(:task, user: user) }
   let(:other_user) { create(:user) }
-  let!(:other_users_task) { create(:task, user_id: other_user.id) }
+  let!(:other_users_task) { create(:task, user: other_user) }
   before { login(user) }
 
   describe 'タスクを新規作成するとき' do
