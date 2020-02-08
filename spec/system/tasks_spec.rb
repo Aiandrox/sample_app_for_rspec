@@ -83,7 +83,7 @@ RSpec.describe "Tasks", type: :system do
   end
 
   describe 'タスク削除' do
-    fcontext '他人のタスクを削除するとき' do
+    context '他人のタスクを削除するとき' do
       before { send_delete_request(task_path(other_users_task)) }
       it('他人のタスクが削除されていない') { expect(page).to have_content other_users_task.title }
       it('ルートにリダイレクト') { expect(current_path).to eq root_path }
