@@ -83,9 +83,9 @@ RSpec.describe "Tasks", type: :system do
   end
 
   describe 'タスク削除' do
-    xcontext '他人のタスクを削除するとき' do
-      before {  } # destroyアクションにアクセスする
-      it('アクセス制限メッセージを表示') { expect(page).to have_content 'Forbidden access.' }
+    fcontext '他人のタスクを削除するとき' do
+      before { send_delete_request(task_path(other_users_task)) }
+      it('他人のタスクが削除されていない') { expect(page).to have_content other_users_task.title }
       it('ルートにリダイレクト') { expect(current_path).to eq root_path }
     end
     context '自分のタスクを削除するとき' do
@@ -95,13 +95,13 @@ RSpec.describe "Tasks", type: :system do
       end
       it('確認ダイアログを表示') { expect(page.driver.browser.switch_to.alert.text).to eq 'Are you sure?' }
       context 'タスクの削除を許可するとき' do
-        before { page.driver.browser.switch_to.alert.accept }
+        before { page.accept_confirm }
         it('タスク削除成功メッセージを表示') {expect(page).to have_content 'Task was successfully destroyed.' }
         it('タスク一覧ページにリダイレクト') { expect(current_path).to eq tasks_path }
         it('タスク一覧ページからタイトルが削除'){ expect(page).to have_no_content my_task.title }
       end
       context 'タスクの削除をキャンセルするとき' do
-        before { page.driver.browser.switch_to.alert.dismiss }
+        before { page.dismiss_confirm }
         it('ルートのまま') { expect(current_path).to eq root_path }
         it('タスク一覧ページにタイトルが存在する') { expect(page).to have_content my_task.title }
       end

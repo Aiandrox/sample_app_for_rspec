@@ -61,4 +61,5 @@ RSpec.configure do |config|
 
   config.include FactoryBot::Syntax::Methods
   config.include LoginHelpers
+  config.include DeleteRequestHelpers
 end
