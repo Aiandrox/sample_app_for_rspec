@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe "UserSessions", type: :system do
   let(:user) { create(:user) }
-  describe 'ログイン前' do
+  describe 'ログイン' do
     before { visit login_path }
     context 'フォームの入力値が正常なとき' do
       before do
@@ -33,7 +33,7 @@ RSpec.describe "UserSessions", type: :system do
     end
   end
 
-  describe 'ログイン後' do
+  describe 'ログアウト' do
     before { login(user) }
     context 'ログアウトボタンを押す' do
       before do
@@ -44,7 +44,7 @@ RSpec.describe "UserSessions", type: :system do
     end
   end
 
-  describe 'アクセス制限' do
+  describe 'アクセス制限に関して' do
     let!(:task) { create(:task) }
     shared_examples_for 'ログインページにリダイレクト' do
       it { expect(current_path).to eq login_path }
@@ -52,7 +52,7 @@ RSpec.describe "UserSessions", type: :system do
     shared_examples_for 'ログイン要求メッセージを表示' do
       it { expect(page).to have_content 'Login required' }
     end
-    describe '未ログインユーザー' do
+    describe '未ログインユーザーが' do
       context 'タスク新規作成ページにアクセスするとき' do
         before { visit new_task_path } 
         it_behaves_like 'ログイン要求メッセージを表示'
@@ -69,7 +69,7 @@ RSpec.describe "UserSessions", type: :system do
         it_behaves_like 'ログインページにリダイレクト'
       end
     end
-    describe 'ログインユーザー' do
+    describe 'ログインユーザーが' do
       before { login(user) }
       context 'タスク新規作成ページにアクセスするとき' do
         before { visit new_task_path }

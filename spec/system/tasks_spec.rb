@@ -7,7 +7,7 @@ RSpec.describe "Tasks", type: :system do
   let!(:other_users_task) { create(:task, user: other_user) }
   before { login(user) }
 
-  describe 'タスクを新規作成するとき' do
+  describe 'タスク新規作成' do
     before do
       visit root_path
       click_link 'New Task'
