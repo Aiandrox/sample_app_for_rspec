@@ -38,31 +38,16 @@ RSpec.describe "UserSessions", type: :system do
 
   describe 'アクセス制限' do
     let!(:task) { create(:task) }
-    shared_examples_for 'ログインページにリダイレクト' do
-      it { expect(current_path).to eq login_path }
-      it { expect(page).to have_content 'Login required' }
-    end
     context '未ログインユーザーのとき' do
-      context 'タスク新規作成ページにアクセスする' do
-        before { visit new_task_path } 
-        it_behaves_like 'ログインページにリダイレクト'
-      end
-      context 'タスク編集ページにアクセスするとき' do
-        before { visit edit_task_path(task) }
-        it_behaves_like 'ログインページにリダイレクト'
-      end
-      context 'マイページにアクセスするとき' do
-        before { visit user_path(user) }
-        it_behaves_like 'ログインページにリダイレクト'
+      it 'マイページにアクセスする ログインページにリダイレクト' do
+        visit user_path(user)
+        expect(current_path).to eq login_path
+        expect(page).to have_content 'Login required'
       end
     end
-    describe 'ログインユーザーのとき' do
-      before { login(user) }
-      it 'タスク新規作成ページにアクセスする 正しく遷移' do
-        visit new_task_path
-        expect(current_path).to eq new_task_path
-      end
+    context 'ログインユーザーのとき' do
       it 'マイページにアクセスする 正しく遷移' do
+        login(user)
         visit user_path(user)
         expect(current_path).to eq user_path(user)
       end
