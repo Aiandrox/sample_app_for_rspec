@@ -24,9 +24,9 @@ RSpec.describe "Tasks", type: :system do
         fill_in 'Content', with: "New task's content"
         select 'todo', from: 'Status'
         click_button 'Create Task'
-        expect(page).to have_content  "New task's title"
         expect(page).to have_content 'Task was successfully created.'
-        expect(current_path).to eq task_path(Task.last)
+        expect(page).to have_content "Title: New task’s title"
+        expect(page).to have_content "Content: New task’s content"
       end
       it 'タイトルが未入力のとき 失敗' do
         fill_in 'Title',	with: ''
