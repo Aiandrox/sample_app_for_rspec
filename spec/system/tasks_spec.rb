@@ -25,8 +25,8 @@ RSpec.describe "Tasks", type: :system do
         select 'todo', from: 'Status'
         click_button 'Create Task'
         expect(page).to have_content 'Task was successfully created.'
-        expect(page).to have_content "Title: New task’s title"
-        expect(page).to have_content "Content: New task’s content"
+        expect(page).to have_content "Title: New task's title"
+        expect(page).to have_content "Content: New task's content"
       end
       it 'タイトルが未入力のとき 失敗' do
         fill_in 'Title',	with: ''
@@ -85,29 +85,22 @@ RSpec.describe "Tasks", type: :system do
   end
 
   describe 'タスク削除' do
-    before { login(user) }
-    it '他人のタスクを削除するとき アクセスを弾かれる' do
-      send_delete_request(task_path(other_user_task))
-      expect(page).to have_content other_user_task.title
-      expect(current_path).to eq root_path
+    before do
+      login(user)
+      visit root_path
+      click_link 'Destroy', href: task_path(my_task)
+      expect(page.driver.browser.switch_to.alert.text).to eq 'Are you sure?'
     end
-    context '自分のタスクを削除するとき' do
-      before do
-        visit root_path
-        click_link 'Destroy', href: task_path(my_task)
-        expect(page.driver.browser.switch_to.alert.text).to eq 'Are you sure?'
-      end
-      it 'タスクの削除を許可するとき 削除される' do
-        page.accept_confirm
-        expect(page).to have_content 'Task was successfully destroyed.'
-        expect(current_path).to eq tasks_path
-        expect(page).to have_no_content my_task.title
-      end
-      it 'タスクの削除をキャンセルするとき 削除されない' do
-        page.dismiss_confirm
-        expect(current_path).to eq root_path
-        expect(page).to have_content my_task.title
-      end
+    it 'タスクの削除を許可するとき 削除される' do
+      page.accept_confirm
+      expect(page).to have_content 'Task was successfully destroyed.'
+      expect(current_path).to eq tasks_path
+      expect(page).to have_no_content my_task.title
+    end
+    it 'タスクの削除をキャンセルするとき 削除されない' do
+      page.dismiss_confirm
+      expect(current_path).to eq root_path
+      expect(page).to have_content my_task.title
     end
   end
 
