@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.fdescribe "UserSessions", type: :system do
+RSpec.describe "UserSessions", type: :system do
   let(:user) { create(:user) }
   describe 'ログイン' do
     before { visit login_path }
