@@ -4,7 +4,7 @@ RSpec.describe "Tasks", type: :system do
   let(:user) { create(:user) }
   let!(:my_task) { create(:task, user: user) }
   let(:other_user) { create(:user) }
-  let!(:other_users_task) { create(:task, user: other_user) }
+  let!(:other_user_task) { create(:task, user: other_user) }
   before { login(user) }
 
   describe 'タスク新規作成' do
@@ -36,7 +36,7 @@ RSpec.describe "Tasks", type: :system do
 
   describe 'タスク編集' do
     it '他人のタスク編集ページにアクセスするとき アクセスを弾かれる' do
-      visit edit_task_path(other_users_task)
+      visit edit_task_path(other_user_task)
       expect(page).to have_content 'Forbidden access.'
       expect(current_path).to eq root_path
     end
@@ -70,8 +70,8 @@ RSpec.describe "Tasks", type: :system do
 
   describe 'タスク削除' do
     it '他人のタスクを削除するとき アクセスを弾かれる' do
-      send_delete_request(task_path(other_users_task))
-      expect(page).to have_content other_users_task.title
+      send_delete_request(task_path(other_user_task))
+      expect(page).to have_content other_user_task.title
       expect(current_path).to eq root_path
     end
     context '自分のタスクを削除するとき' do
@@ -99,21 +99,21 @@ RSpec.describe "Tasks", type: :system do
       visit user_path(user)
       expect(page).to have_content user.tasks.count
       expect(page).to have_content my_task.title
-      expect(page).to have_no_content other_users_task.title
+      expect(page).to have_no_content other_user_task.title
     end
     context 'タスク一覧画面に' do
       before { visit tasks_path }
       it '全てのタスクにShowボタンを表示' do
         expect(page).to have_link 'Show', href: task_path(my_task)
-        expect(page).to have_link 'Show', href: task_path(other_users_task)
+        expect(page).to have_link 'Show', href: task_path(other_user_task)
       end
       it '自分のタスクにEdit/Destroyボタンを表示' do
         expect(page).to have_link 'Edit', href: edit_task_path(my_task)
         expect(page).to have_link 'Destroy', href: task_path(my_task)
       end
       it '他人のタスクにはEdit/Destroyボタンが非表示' do
-        expect(page).to have_no_link 'Edit', href: edit_task_path(other_users_task)
-        expect(page).to have_no_link 'Destroy', href: task_path(other_users_task)
+        expect(page).to have_no_link 'Edit', href: edit_task_path(other_user_task)
+        expect(page).to have_no_link 'Destroy', href: task_path(other_user_task)
       end
     end
   end
