@@ -54,7 +54,7 @@ RSpec.describe "Tasks", type: :system do
       expect(page).to have_content 'Forbidden access.'
       expect(current_path).to eq root_path
     end
-    describe '自分のタスクの編集' do
+    context '自分のタスクの場合' do
       before do
         login(user)
         visit root_path

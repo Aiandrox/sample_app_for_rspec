@@ -42,7 +42,7 @@ RSpec.describe "Users", type: :system do
       expect(page).to have_content 'Forbidden access.'
       expect(current_path).to eq user_path(user)
     end
-    describe '自分のユーザー情報の編集' do
+    context '自分のユーザー情報の場合' do
       before do
         visit root_path
         click_on 'Mypage'
