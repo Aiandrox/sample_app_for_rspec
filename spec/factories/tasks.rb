@@ -1,8 +1,7 @@
 FactoryBot.define do
-  sequence(:title) { |n| "title_#{n}" }
-
   factory :task do
-    title { generate :title }
+    sequence(:title) { |n| "title_#{n}" }
     status { :todo }
+    user
   end
 end
